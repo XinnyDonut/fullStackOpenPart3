@@ -34,7 +34,9 @@ let persons=[
 
 
 
-
+app.get("/",(req,res)=>{
+    res.send("Hello World!")
+})
 
 app.get('/api/persons',(req,res)=>{
     res.json(persons)
