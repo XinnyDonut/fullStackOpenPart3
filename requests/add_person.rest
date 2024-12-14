@@ -1,0 +1,31 @@
+POST http://localhost:3001/api/persons
+Content-Type:application/json
+
+{    
+      "name": "Art Hellas"
+}
+###
+POST http://localhost:3001/api/persons
+Content-Type:application/json
+
+{    
+     "name": "Ada Lovelace", 
+      "number": "39-44-5323523"
+}
+###
+POST http://localhost:3001/api/persons
+Content-Type:application/json
+
+{    
+     "name": "Xinxin Wang", 
+      "number": "39-44-5323544423"
+}
+
+
+###
+POST http://localhost:3001/api/persons
+Content-Type:application/json
+
+{     
+ "number": "39-44-5323544423"
+}
