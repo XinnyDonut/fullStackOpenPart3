@@ -1,24 +1,35 @@
 POST http://localhost:3001/api/persons
-Content-Type:application/json
+Content-Type: application/json
 
 {    
       "name": "Art Hellas"
 }
+
+
+### test for existing person
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+      "name":"Arto Vinhavaine",
+      "number":89989
+}
+
 ###
 POST http://localhost:3001/api/persons
 Content-Type:application/json
 
 {    
      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
+      "number": "39-44-88832458"
 }
-###
+### test for new person
 POST http://localhost:3001/api/persons
 Content-Type:application/json
 
 {    
-     "name": "Xinxin Wang", 
-      "number": "39-44-5323544423"
+     "name": "Xinxin Zhg", 
+      "number": "39-44-5323"
 }
 
 

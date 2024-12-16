@@ -1,3 +1,4 @@
+const Person=require('./models/person')
 const express =require('express')
 const morgan=require('morgan')
 const cors= require('cors')
@@ -33,36 +34,39 @@ let persons=[
 ]
 
 
-
-
-app.get("/",(req,res)=>{
-    res.send("Hello World!")
-})
-
 app.get('/api/persons',(req,res)=>{
-    res.json(persons)
+    Person.find({})
+        .then(result=>res.json(result))    
 })
 
 app.get('/info',(req,res)=>{
-    res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date().toString()}</p>`)
+    Person.countDocuments({})
+    .then(count=>
+        res.send(`<p>Phonebook has info for ${count} people</p><p>${new Date().toString()}</p>`)
+    )
+    .catch(error=>{
+        res.status(500).send({error:'problem handing counting doc'})
+    })
 })
 
-app.get('/api/persons/:id',(req,res)=>{
+app.get('/api/persons/:id',(req,res,next)=>{
     const id=req.params.id
-    const person=persons.find(p=>p.id===id)
-    if(!person){
-        res.status(404).end()
-    }else{
-        res.json(person)
-    }
+    Person.findById(id)
+        .then(p=>{
+            if(p){
+                res.json(p)
+            }else{
+                res.status(404).end()
+            }
+        })
+        .catch(error=>next(error))
 })
 
-app.delete('/api/persons/:id',(req,res)=>{
+app.delete('/api/persons/:id',(req,res,next)=>{
     const id=req.params.id 
-    persons=persons.filter(p=>p.id!==id)
-    // const person = persons.find(p => p.id === id)
-    // res.json(person)
-    res.status(204).end()
+    Person.findByIdAndDelete(id)
+        .then(result=>res.status(204).end())
+        .catch(error=>next(error))
 })
 
 const generateId=()=>{
@@ -74,7 +78,7 @@ const generateId=()=>{
     return id
 }
 
-app.post('/api/persons',(req,res)=>{
+app.post('/api/persons',(req,res,next)=>{
     const body=req.body
     if(!body.name){
         return res.status(400).json({error:'Name  missing'})
@@ -82,22 +86,42 @@ app.post('/api/persons',(req,res)=>{
     if(!body.number){
         return res.status(400).json({error:'Number  missing'})
     }
-    if(persons.find(p=>p.name===body.name)){
-        return res.status(400).json({error:'Name must be unique'})
-    }
-    const person={
-        name:body.name,
-        number:body.number,
-        id:generateId(),
-    }
 
-    persons=persons.concat(person)
-    res.json(person)
+    Person.findOne({name:body.name})
+        .then(existingP=>{
+            if(existingP){
+                console.log(`${body.name} exist`);
+                
+                const id=existingP.id
+                const p={
+                    name:body.name,
+                    number:body.number
+                }
+                Person.findByIdAndUpdate(id,p,{new:true})
+                    .then(updatedP=>res.json(updatedP))
+                    .catch(error=>next(error))
+            }else{
+                const person=new Person({
+                    name:body.name,
+                    number:body.number,
+                })
+                person.save()
+                    .then(savedPerson=>res.json(savedPerson))
+            }   
+        })
 })
 
+const errorhandler=(error,req,res,next)=>{
+    console.error(error.message)
+    if(error.name==='CastError'){
+        return res.status(400).send({error:'malformatted id'})
+    }
+    next(error)
+}
+app.use(errorhandler)
 
 
-const PORT=process.env.PORT||3001
+const PORT=process.env.PORT||3000
 app.listen(PORT,()=>{
     console.log(`Server running on port ${PORT}`);
     
