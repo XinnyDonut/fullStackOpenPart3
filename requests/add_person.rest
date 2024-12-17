@@ -20,8 +20,8 @@ POST http://localhost:3001/api/persons
 Content-Type:application/json
 
 {    
-     "name": "Ada Lovelace", 
-      "number": "39-44-88832458"
+     "name": "Aaaaaa", 
+      "number": "3944-88832458"
 }
 ### test for new person
 POST http://localhost:3001/api/persons
